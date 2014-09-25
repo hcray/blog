@@ -1,12 +1,20 @@
 ---
 layout: default
 title: 我的Blog
-category:分类1
+description:首页
 ---
 <h2>{{ page.title }}</h2>
 <p>最新文章1</p>
-<ul>
+
 　　{% for post in site.posts %}
 　　　　<li>{{ post.date | date_to_string }} <a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></li>
+	  <div class="blog-post">
+	     <h2 class="blog-post-title">{{ page.title }}</h2>
+	     <p class="blog-post-meta">{{ page.description }}</p>
+	  </div><!-- /.blog-post -->
 　　{% endfor %}
-</ul>
+
+  <ul class="pager">
+    <li><a href="#">Previous</a></li>
+    <li><a href="#">Next</a></li>
+  </ul>
