@@ -3,10 +3,19 @@ layout: default
 title: 我的Blog
 ---
 　　{% for post in site.posts %}
-	 <div class="blog-post">
+	<!-- 
+	<div class="blog-post">
 	 	<h2 class="blog-post-title"><cite>[{{ post.date | date:"%Y-%m-%d"  }}]</cite> <a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></h2>
 	 	<p class="blog-post-meta">{{ post.description }}</p>
-	 </div><!-- /.blog-post -->
+	</div>
+	 -->
+	 
+	<div class="panel panel-default">
+		<div class="panel-heading"><cite>[{{ post.date | date:"%Y-%m-%d"  }}]</cite> <a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></div>
+		<div class="panel-body">
+		    {{ post.description }}
+ 		</div>
+	</div>
 　　{% endfor %}
   <ul class="pager">
     <li><a href="#">Previous</a></li>
