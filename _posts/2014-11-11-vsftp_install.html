@@ -1,0 +1,42 @@
+---
+layout: post
+title: vsftp的安装
+category: linux
+description: vsftp的安装和配置 
+keywords: vsftp
+---
+<p>vsftp的安装</p>
+<pre>
+1、安装包
+rpm -ivh vsftpd-2.0.5-28.el5.x86_64.rpm
+
+2、设置开机启动
+检查开机启动的选项
+chkconfig --list
+开机启动
+chkconfig vsftpd on
+
+3、设置登录用户
+whereis vdftpd
+
+cd  /etc/vsftd/
+vsftpd.conf
+
+ftpusers:禁止登录的用户
+user_list:允许登录的用户
+
+vi编辑器中的搜索使命是斜杠“/”，然后输入要查找的内容，回车确定。以下是要更改的选项
+anonymous_enable=NO  #禁止匿名访问
+ascii_upload_enable #允许使用ascii码上传
+ascii_download_enable #允许使用ascii码下载
+userlist_deny=NO #（这条需手动添加到最后）使用FTP用户表，表里没有的用户需要添加才能登录
+
+
+4、启动服务
+service vsftpd start
+
+
+登录的用户只能上传自己home目录下的文件，后续还需配置
+useradd ftpuser回车，然后为baidu这个用户添加密码passwd ftpuser，会提示输入两次密码
+
+</pre>
