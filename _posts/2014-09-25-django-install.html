@@ -1,0 +1,36 @@
+---
+layout: post
+title: django的安装
+category: python
+description: django的安装
+keywords: python,django
+---
+<p>django的安装</p>
+<pre>
+	1、解压django，cmd 切到相应的路径，运行 setup.py install
+	2、>>> import django，>>> django.VERSION    (1, 6, 1, 'final', 0) 说明安装成功
+	3、配置环境变量 path=path;D:\Python33;D:\Python33\Lib\site-packages\django\bin
+	4、创建一个web工程，cmd 下 运行 django-admin.py startproject mysite 创建工程mysite
+	5、切换到mysite目录，运行“python manage.py runserver”，你将看到如下信息
+	Validating models...
+
+	0 errors found
+	January 05, 2014 - 21:06:42
+	Django version 1.6.1, using settings 'mysite.settings'
+	Starting development server at http://127.0.0.1:8000/
+	Quit the server with CTRL-BREAK.
+	这样你就启动了Django开发用服务器，这是一个包含在Django中的开发阶段使用的轻量级Web服务器
+	我们在Django中包含了这个服务器是为了快速开发，这样在产品投入应用之前，就可以不用处理生产环境中
+	web server的配置工作了。
+	这个服务器查看你的代码，如果有改动，它自动reload，让你不需重启快速修改你的项目
+	虽然这个开发用服务器对于开发来说简直棒透了，还是请克制一下把它用在任何形式的生产环境中的冲动。
+	这个服务器一次只能可靠地处理一个请求，而且根本没有经过任何安全性的检验
+	如果你的站点需要上线，请参考第21章的关于部署Django程序的介绍
+	默认情况下runserver命令启动服务器的端口为8000，只监听本地连接
+	如果你希望改变端口，增加一个命令行参数即可
+	python manage.py runserver 8080
+	你也可以改变服务器监听的IP地址，当你同其它开发者分享一个开发站点时很有用
+	python manage.py runserver 0.0.0.0:8080
+	上面的命令使得Django监听任何网络接口，这样的话就允许其它计算机连接该服务器
+	试着访问http://127.0.0.1:8000/，你将会看到“Welcome to Django”的页面
+</pre>
