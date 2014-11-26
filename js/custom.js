@@ -6,8 +6,8 @@ $(document).ready(function(){
 	}else if("http://daoliuhe.com/pages/categorys.html" == curLocation){
 		$("#category").addClass("active");
 	
-	}else if("http://daoliuhe.com/pages/phote.html" == curLocation){
-			$("#phote").addClass("active");
+	}else if("http://daoliuhe.com/pages/photo.html" == curLocation){
+			$("#photo").addClass("active");
 		
 	}else if("http://daoliuhe.com/pages/message.html" == curLocation){
 		$("#message").addClass("active");
