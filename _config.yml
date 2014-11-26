@@ -2,3 +2,5 @@ baseurl: /
 markdown: rdiscount
 pygments: true
 url: http://daoliuhe.com
+
+paginate: 5
