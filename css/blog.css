@@ -79,17 +79,17 @@ h6, .h6 {
  */
 
 .blog-header {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 .blog-title {
   margin-top: 0px;
   margin-bottom: 0;
-  font-size: 40px;
+  font-size: 30px;
   font-weight: normal;
 }
 .blog-description {
-  font-size: 20px;
+  font-size: 12px;
   color: #999;
 }
 
@@ -123,11 +123,11 @@ h6, .h6 {
 
 /* Pagination */
 .pager {
-  margin-bottom: 60px;
+  margin-bottom: 20px;
   text-align: left;
 }
 .pager > li > a {
-  width: 100px;
+  width: 80px;
   padding: 5px 5px;
   text-align: center;
   border-radius: 20px;
@@ -156,7 +156,7 @@ h6, .h6 {
  */
 
 .blog-footer {
-  padding: 15px 0;
+  padding: 10px 0;
   color: #999;
   text-align: center;
   background-color: #f9f9f9;
