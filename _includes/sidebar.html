@@ -13,7 +13,7 @@
 		<h4>分类&nbsp;(<em>Categories</em>)</h4>
 		<ol class="list-unstyled">
 			{% for category in site.categories %}
-			<li><a href="{{ site.url }}/categorys/{{ category | first  }}.html">{{ category | first  }}({{ category | last | size  }})</a></li>
+			<li><a href="{{ site.url }}/categorys/categorys.html#{{ category | first  }}">{{ category | first  }}({{ category | last | size  }})</a></li>
 			{% endfor  %}
 		</ol>
 	</div>
