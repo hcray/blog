@@ -1,0 +1,90 @@
+---
+layout: post
+title: cookie说明
+category: langue
+description: cookie特殊字符说明
+keywords: cookie
+---
+<p>cookie说明</p>
+<pre>
+关于cookie特殊字符的一点理解
+
+背景：
+加密的cookie信息中带有特殊字符（“=”），导致读cookie的时候，特殊符号丢失，解密失败
+
+看了同事“关于cookie特殊字符”的说明邮件，和网上对cookie特殊字符问题的解释：
+我们在实际使用Cookie过程中要注意一些问题：
+
+  1. Cookie的兼容性问题
+
+  Cookie的格式有2个不同的版本，第一个版本，我们称为Cookie Version 0，是最初由Netscape公司制定的，也被几乎所有的浏览器支持。而较新的版本，Cookie Version 1，则是根据RFC 2109文档制定的。为了确保兼容性，JAVA规定，前面所提到的涉及Cookie的操作都是针对旧版本的Cookie进行的。而新版本的Cookie目前还不被Javax.servlet.http.Cookie包所支持。
+
+  2. Cookie的内容
+
+  同样的Cookie的内容的字符限制针对不同的Cookie版本也有不同。在Cookie Version 0中，某些特殊的字符，例如：空格，方括号，圆括号，等于号（=），逗号，双引号，斜杠，问号，@符号，冒号，分号都不能作为Cookie的内容。这也就是为什么我们在例子中设定Cookie的内容为“Test_Content”的原因。
+
+  虽然在Cookie Version 1规定中放宽了限制，可以使用这些字符，但是考虑到新版本的Cookie规范目前仍然没有为所有的浏览器所支持，因而为保险起见，我们应该在Cookie的内容中尽量避免使用这些字符。
+
+摘自：http://swingchen.bokee.com/6200015.html
+类似这样的解释，搜索出来的结果，挺多。
+
+但是，我去看了RFC2109（http://www.faqs.org/rfcs/rfc2109.html）,其说明如下：
+
+value中的token，是有一组非特殊字符，非空白字符。而它是在RFC 2068（http://www.faqs.org/rfcs/rfc2068.html）中制定的 （是对Header的规范），请看：
+
+
+也就是说，所谓的Cookie1,同样有特殊字符的限制。
+同样，在Cookie2（RFC2965）中，也如此。
+
+想想也是啊，如果没有特殊字符的限制，解析Header的时候，还不乱套了？
+
+看了RFC之后，我们再来看看Tomcat中的实现（6.0.29版本），请看：
+org.apache.tomcat.util.http.Cookies
+
+1.类注释：
+A collection of cookies - reusable and tuned for server side performance.
+Based on RFC2965 ( and 2109 )
+是基于RFC2965/RFC2109规范来实现的
+
+2.特殊字符的定义
+/*
+    List of Separator Characters (see isSeparator())
+    Excluding the '/' char violates the RFC, but
+    it looks like a lot of people put '/'
+    in unquoted values: '/': ; //47
+    '\t':9 ' ':32 '\"':34 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60
+    '=':61 '>':62 '?':63 '@':64 '[':91 '\\':92 ']':93 '{':123 '}':125
+    */
+    public static final char SEPARATORS[] = { '\t', ' ', '\"', '(', ')', ',',
+        ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
+根据规范，定义了特殊字符。除了“/”这个符号。因为大多数人会直接使用“/”。
+
+3.针对“=”特殊处理
+/**
+* If true, cookie values are allowed to contain an equals character without
+* being quoted.
+*/
+public static final boolean ALLOW_EQUALS_IN_VALUE;
+
+static {
+    ALLOW_EQUALS_IN_VALUE = Boolean.valueOf(System.getProperty(
+            "org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE",
+            "false")).booleanValue();
+}
+可以在catalina.properties中，添加这个配置项 （或者启动过程中加上-D参数），使得cookie value中允许存在“=”符号。
+所以本文开头提到的问题，可以使用这个方法得到解决
+
+4.解析过程
+/**
+* Parses a cookie header after the initial "Cookie:"
+* [WS][$]token[WS]=[WS](token|QV)[;|,]
+* RFC 2965
+* JVK
+*/
+public final void processCookieHeader(byte bytes[], int off, int len){
+    //详细代码，省略
+}
+
+
+
+</pre>
