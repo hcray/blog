@@ -1,0 +1,28 @@
+---
+layout: post
+title: Eclipse下修改工程名
+category: eclipse
+description: Eclipse下修改工程名
+keywords: eclipse,project
+---
+<p>Eclipse下修改工程名</p>
+<pre>
+	一、
+	右键工程：Refactor->Rename，或选中工程按F2，修改名称
+	二、
+	右键工程：Properties->Web Project Settings,修改Context Root
+	三、
+	修改项目目录/.setting目录下的org.eclipse.wst.common.component文件，project-modules的wb-module内容，包括：
+	deploy-name：配置到web server时显示的组件名称；
+	java-output-path：类编译文件的输出位置；
+	context-root：部署目录。
+	四、
+	1.修改项目目录下：.project文件
+</pre>
+<pre class="brush: xml;">
+	 <?xml version="1.0" encoding="UTF-8"?>
+		   <projectDescription>
+				<name>CMS</name>
+				...
+			</projectDescription>
+</pre>
