@@ -1,0 +1,116 @@
+---
+layout: post
+title: break和continue的用法
+category: java
+description: break和continue的用法
+keywords: break,continue
+---
+<p>break和continue的用法</p>
+一直只了解break和continue的用法，也知道可以加label，但是感觉有goto的影子，影响代码结构，没有使用；多次循环就自己加标志位，看到同事用了一下，感觉还挺优雅，记录下来。
+1、break语句可以用于switch、for、while、do-while，用于结束最近一层(当前所在的循环)。如果是两层循环则只能跳出最近的一层循环。
+<pre class="brush: java;">
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			if (j == 2) {
+				break;
+			}
+			System.out.println("i: " + i + " j: " + j);
+		}
+	}
+</pre>
+<pre>
+结果：
+	i: 0 j: 0
+	i: 0 j: 1
+	i: 1 j: 0
+	i: 1 j: 1
+	i: 2 j: 0
+	i: 2 j: 1
+	i: 3 j: 0
+	i: 3 j: 1
+	i: 4 j: 0
+	i: 4 j: 1
+</pre>
+
+
+2、continue语句可以用于for、while、do-while，用于跳出当次操作，继续下面的循环。
+<pre class="brush: java;">
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			if (j == 2) {
+				continue;
+			}
+			System.out.println("i: " + i + " j: " + j);
+		}
+	}
+</pre>
+<pre>
+结果：
+	i: 0 j: 0
+	i: 0 j: 1
+	i: 0 j: 3
+	i: 0 j: 4
+	i: 1 j: 0
+	i: 1 j: 1
+	i: 1 j: 3
+	i: 1 j: 4
+	i: 2 j: 0
+	i: 2 j: 1
+	i: 2 j: 3
+	i: 2 j: 4
+	i: 3 j: 0
+	i: 3 j: 1
+	i: 3 j: 3
+	i: 3 j: 4
+	i: 4 j: 0
+	i: 4 j: 1
+	i: 4 j: 3
+	i: 4 j: 4
+</pre>
+
+3、break label 可以跳出label后所跟多层循环尾处，跳出label和break的一致的是,不加标签跳出本次循环，加了标签跳出标签后的循环。
+<pre class="brush: java;">
+	label:
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			if (j == 2) {
+				break label;
+			}
+			System.out.println("i: " + i + " j: " + j);
+		}
+	}
+</pre>
+<pre>
+结果：
+	i: 0 j: 0
+	i: 0 j: 1
+</pre>
+
+4、continue label 跳出label后面跟多层循环，重新执行;不加标签就是当前循环重新执行，加了标签就是跳出标签后的循环，重新执行。
+<pre class="brush: java;">
+	label:
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			if (j == 2) {
+				continue label;
+			}
+			System.out.println("i: " + i + " j: " + j);
+		}
+	}
+</pre>
+<pre>
+结果：
+	i: 0 j: 0
+	i: 0 j: 1
+	i: 1 j: 0
+	i: 1 j: 1
+	i: 2 j: 0
+	i: 2 j: 1
+	i: 3 j: 0
+	i: 3 j: 1
+	i: 4 j: 0
+	i: 4 j: 1
+</pre>
+
+5、return就简单了，直接返回，没有任何操作。
+
