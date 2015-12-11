@@ -1,0 +1,104 @@
+---
+layout: post
+title: 运算符
+category: java
+description: +=,=+,i++,++i
+keywords: =+,=+,i++,++i
+---
+<p>运算符小结</p>
+1、i++,比较简单就是i=i+1的缩写，同理i--就是i=i-1的缩写
+<pre class="brush: java;">
+	int i = 2, j = 0;
+	j = i++;
+	System.out.println("i: " + i + " j: " + j);
+</pre>
+<pre>
+结果：
+	i: 3 j: 2
+</pre>
+
+2、++i,也很简单，其实也是i=i+1,但是如果j=++i,就不一样了，先对i进行自增，然后在赋值给j;--同理
+<pre class="brush: java;">
+	int i = 2, j = 0;
+	j = ++i;
+	System.out.println("i: " + i + " j: " + j);
+</pre>
+<pre>
+结果：
+	i: 3 j: 3
+</pre>
+
+
+3、+= 就是两个数值相加的简写;y+=x即y=y+x; -=,*=,/=同理
+<pre class="brush: java;">
+	int i = 2, j = 3;
+	j += i;
+	System.out.println("i: " + i + " j: " + j);
+</pre>
+<pre>
+结果：
+	i: 2 j: 5
+</pre>
+
+4、=+这个就比较奇怪了，到底是先加了，还是先赋值呢。j=+i;其实就是赋值语句
+<pre class="brush: java;">
+		int i = 2, j = 3;
+		j =+ i;
+		System.out.println("i: " + i + " j: " + j);
+</pre>
+<pre>
+结果：
+	i: 2 j: 2
+</pre>
+有些人就会说了，那和j=i的结果是一致的，有什么区别呢。程序猿就要刨根问底，于是乎，查看字节码，如下:
+可以看出来字节码是一致，而且没有iadd操作，说明没有什么区别，这样写法也会是语法兼容的结果吧。
+<pre class="brush: java;">
+		int i = 2, j = 3;
+		j = i;
+		
+</pre>
+<pre>
+字节码：
+public class com.dahuatech.test.testFor.TestOperator {
+  public com.dahuatech.test.testFor.TestOperator();
+    Code:
+       0: aload_0
+       1: invokespecial #8                  // Method java/lang/Object."<init>":
+()V
+       4: return
+
+  public static void main(java.lang.String[]);
+    Code:
+       0: iconst_2
+       1: istore_1
+       2: iconst_3
+       3: istore_2
+       4: iload_1
+       5: istore_2
+       6: return
+}
+</pre>
+<pre class="brush: java;">
+		int i = 2, j = 3;
+		j =+ i;
+</pre>
+<pre>
+字节码：
+public class com.dahuatech.test.testFor.TestOperator {
+  public com.dahuatech.test.testFor.TestOperator();
+    Code:
+       0: aload_0
+       1: invokespecial #8                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static void main(java.lang.String[]);
+    Code:
+       0: iconst_2
+       1: istore_1
+       2: iconst_3
+       3: istore_2
+       4: iload_1
+       5: istore_2
+       6: return
+}
+</pre>
