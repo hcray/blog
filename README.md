@@ -13,6 +13,8 @@ gem sources -r https://rubygems.org/
 gem sources -a https://ruby.taobao.org
 ####3、本地运行 >jekyll server 运行本地的服务
  gem install jekyll
+ 分页插件
+ gem install jekyll-paginate
  生成静态页面
   jekyll new myblog
   

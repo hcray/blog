@@ -2,36 +2,46 @@
 layout: default
 title: 我的Blog
 ---
+
 {% for post in paginator.posts %}
-<!-- 
-<div class="blog-post">
- 	<h2 class="blog-post-title"><cite>[{{ post.date | date:"%Y-%m-%d"  }}]</cite> <a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></h2>
- 	<p class="blog-post-meta">{{ post.description }}</p>
-</div>
- -->
 <div class="panel panel-default">
-	<div class="panel-heading"><cite>[{{ post.date | date:"%Y-%m-%d"  }}]</cite> <a href="{{ site.url }}{{ post.url }}">{{ post.title }}</a></div>
-	<div class="panel-body blog-body">
-		{{ post.description }}
-	</div>
+    <div class="panel-heading">
+        <cite>[{{ post.date | date:"%Y-%m-%d" }}]</cite>
+        <a href="{{ site.url }}/{{ post.url }}">{{ post.title }}</a>
+    </div>
+    <div class="panel-body blog-body">
+        {{ post.description }}
+    </div>
 </div>
 {% endfor %}
-<!-- 
+<!-- Pagination links -->
+<div class="pagination">
+    {% if paginator.previous_page %}
+    <a href="{{ site:url  }}/{{ paginator.previous_page_path }}" class="previous">Previous</a>
+    {% else %}
+    <span class="previous">previous</span>
+    {% endif %}
+    <span class="page_number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
+    {% if paginator.next_page %}
+    <a href="{{ site:url  }}/{{ paginator.next_page_path }}" class="next">Next</a>
+    {% else %}
+    <span class="next ">Next</span>
+    {% endif %}
+</div>
+<!--
 <ul class="pager">
-	<li><a href="#">上一页</a></li>
-	<li><a href="#">下一页</a></li>
-</ul>
- -->
-<ul class="pager">
-	{% if paginator.previous_page %}
-		{% if paginator.previous_page == 1 %}
-		<li><a href="{{ site:url  }}/">上一页</a></li>
-		{% else %}
-		<li><a href="{{ site:url  }}/page{{ paginator.previous_page }}">上一页</a><li>
-		{% endif %}
-	{% endif %}
-	{% if paginator.next_page %}
-	<li><a href="{{ site:url  }}/page{{ paginator.next_page }}">下一页</a></li>
+    {% if paginator.previous_page %}
+    {% if paginator.previous_page == 1 %}
+    <li><a href="{{ site:url  }}/">上一页</a></li>
+    {% else %}
+    <li><a href="{{ site:url  }}/page{{ paginator.previous_page }}">上一页</a>
+    <li>
+        {% endif %}
+        {% endif %}
+        {% if paginator.next_page %}
+    <li><a href="{{ site:url  }}/page{{ paginator.next_page }}">下一页</a></li>
     {% endif %}
 </ul>
+-->
+
 
