@@ -1,0 +1,161 @@
+---
+layout: post
+title: oracle 分页
+category: oracle
+description: oracle 分页的几种写法
+keywords: oracle,sql,page
+---
+<p>oracle 分页</p>
+<h4>1:无ORDER BY排序的写法。(效率最高)</h4>
+<pre>
+(经过测试，此方法成本最低，只嵌套一层，速度最快！即使查询的数据量再大，也几乎不受影响，速度依然！)
+</pre>
+<pre class="brush: sql;">
+SELECT *
+  FROM (SELECT ROWNUM AS rowno, t.*
+          FROM emp t
+         WHERE hire_date BETWEEN TO_DATE ('20060501', 'yyyymmdd')
+                             AND TO_DATE ('20060731', 'yyyymmdd')
+           AND ROWNUM <= 20) table_alias
+ WHERE table_alias.rowno >= 10;
+</pre>
+
+<h4>2:有ORDER BY排序的写法。(效率最高)</h4>
+<pre>
+(经过测试，此方法随着查询范围的扩大，速度也会越来越慢哦！)
+</pre>
+<pre class="brush: sql;">
+SELECT *
+  FROM (SELECT tt.*, ROWNUM AS rowno
+          FROM (  SELECT t.*
+                    FROM emp t
+                   WHERE hire_date BETWEEN TO_DATE ('20060501', 'yyyymmdd')
+                                       AND TO_DATE ('20060731', 'yyyymmdd')
+                ORDER BY create_time DESC, emp_no) tt
+         WHERE ROWNUM <= 20) table_alias
+ WHERE table_alias.rowno >= 10;
+</pre>
+
+<h4>3:无ORDER BY排序的写法。(建议使用方法1代替)</h4>
+<pre>
+(此方法随着查询数据量的扩张，速度会越来越慢哦！)
+</pre>
+<pre class="brush: sql;">
+SELECT *
+  FROM (SELECT ROWNUM AS rowno, t.*
+          FROM k_task t
+         WHERE flight_date BETWEEN TO_DATE ('20060501', 'yyyymmdd')
+                               AND TO_DATE ('20060731', 'yyyymmdd')) table_alias
+ WHERE table_alias.rowno <= 20 AND table_alias.rowno >= 10;
+--TABLE_ALIAS.ROWNO  between 10 and 100;
+</pre>
+
+<h4>4:有ORDER BY排序的写法.(建议使用方法2代替)</h4>
+<pre>
+(此方法随着查询范围的扩大，速度会越来越慢哦！)
+</pre>
+<pre class="brush: sql;">
+SELECT *
+  FROM (SELECT tt.*, ROWNUM AS rowno
+          FROM (  SELECT *
+                    FROM k_task t
+                   WHERE flight_date BETWEEN TO_DATE ('20060501', 'yyyymmdd')
+                                         AND TO_DATE ('20060531', 'yyyymmdd')
+                ORDER BY fact_up_time, flight_no) tt) table_alias
+ WHERE table_alias.rowno BETWEEN 10 AND 20;
+</pre>
+
+<h4>5另类语法。(有ORDER BY写法）</h4>
+<pre>
+(语法风格与传统的SQL语法不同，不方便阅读与理解，为规范与统一标准，不推荐使用。)
+</pre>
+<pre class="brush: sql;">
+WITH partdata AS
+     (
+        SELECT ROWNUM AS rowno, tt.*
+          FROM (  SELECT *
+                    FROM k_task t
+                   WHERE flight_date BETWEEN TO_DATE ('20060501', 'yyyymmdd')
+                                         AND TO_DATE ('20060531', 'yyyymmdd')
+                ORDER BY fact_up_time, flight_no) tt
+         WHERE ROWNUM <= 20)
+SELECT *
+  FROM partdata
+ WHERE rowno >= 10;
+</pre>
+
+<h4>6另类语法 。(无ORDER BY写法）</h4>
+<pre>
+
+</pre>
+<pre class="brush: sql;">
+WITH partdata AS
+     (
+        SELECT ROWNUM AS rowno, t.*
+          FROM k_task t
+         WHERE flight_date BETWEEN TO_DATE ('20060501', 'yyyymmdd')
+                               AND TO_DATE ('20060531', 'yyyymmdd')
+           AND ROWNUM <= 20)
+SELECT *
+  FROM partdata
+ WHERE rowno >= 10;
+</pre>
+
+<pre>
+Oracle的分页查询语句基本上可以按照本文给出的格式来进行套用。
+分页查询格式：
+</pre>
+<pre class="brush: sql;">
+SELECT *
+  FROM (SELECT a.*, ROWNUM rn
+          FROM (SELECT *
+                  FROM table_name) a
+         WHERE ROWNUM <= 40)
+ WHERE rn >= 21
+</pre>
+
+<pre>
+其中最内层的查询SELECT * FROM TABLE_NAME表示不进行翻页的原始查询语句。ROWNUM <= 40和RN >= 21控制分页查询的每页的范围。
+上面给出的这个分页查询语句，在大多数情况拥有较高的效率。分页的目的就是控制输出结果集大小，将结果尽快的返回。在上面的分页查询语句中，这种考虑主要体现在WHERE ROWNUM <= 40这句上。
+选择第21到40条记录存在两种方法，一种是上面例子中展示的在查询的第二层通过ROWNUM <= 40来控制最大值，在查询的最外层控制最小值。而另一种方式是去掉查询第二层的WHERE ROWNUM <= 40语句，在查询的最外层控制分页的最小值和最大值。这是，查询语句如下：
+</pre>
+<pre class="brush: sql;">
+SELECT *
+  FROM (SELECT a.*, ROWNUM rn
+          FROM (SELECT *
+                  FROM table_name) a)
+ WHERE rn BETWEEN 21 AND 40
+</pre>
+<pre>
+    对比这两种写法，绝大多数的情况下，第一个查询的效率比第二个高得多。
+这是由于CBO优化模式下，Oracle可以将外层的查询条件推到内层查询中，以提高内层查询的执行效率。对于第一个查询语句，第二层的查询条件WHERE ROWNUM <= 40就可以被Oracle推入到内层查询中，这样Oracle查询的结果一旦超过了ROWNUM限制条件，就终止查询将结果返回了。
+而第二个查询语句，由于查询条件BETWEEN 21 AND 40是存在于查询的第三层，而Oracle无法将第三层的查询条件推到最内层（即使推到最内层也没有意义，因为最内层查询不知道RN代表什么）。因此，对于第二个查询语句，Oracle最内层返回给中间层的是所有满足条件的数据，而中间层返回给最外层的也是所有数据。数据的过滤在最外层完成，显然这个效率要比第一个查询低得多。
+上面分析的查询不仅仅是针对单表的简单查询，对于最内层查询是复杂的多表联合查询或最内层查询包含排序的情况一样有效。
+这里就不对包含排序的查询进行说明了，下一篇文章会通过例子来详细说明。
+
+下面简单讨论一下多表联合的情况。
+对于最常见的等值表连接查询，CBO一般可能会采用两种连接方式NESTED LOOP和HASH JOIN（MERGE JOIN效率比HASH JOIN效率低，一般CBO不会考虑）。在这里，由于使用了分页，因此指定了一个返回的最大记录数，NESTED LOOP在返回记录数超过最大值时可以马上停止并将结果返回给中间层，而HASH JOIN必须处理完所有结果集（MERGE JOIN也是）。那么在大部分的情况下，对于分页查询选择NESTED LOOP作为查询的连接方法具有较高的效率（分页查询的时候绝大部分的情况是查询前几页的数据，越靠后面的页数访问几率越小）。
+因此，如果不介意在系统中使用HINT的话，可以将分页的查询语句改写为：
+</pre>
+<pre class="brush: sql;">
+    SELECT *
+  FROM (SELECT a.*, ROWNUM rn
+          FROM (SELECT *
+                  FROM table_name) a
+         WHERE ROWNUM <= 40)
+ WHERE rn >= 21
+</pre>
+<pre>
+    Oracle中使用Order By排序时结果顺序不稳定的解决办法
+    Oracle的分页查询是没有进行任何排序操作的，Oracle是顺序的从数据块中读取符合条件的数据返回到客户端。
+而Oracle的排序算法不具有稳定性，也就是说，对于排序键值相等的数据，这种算法完成排序后，不能保证这些键值相等的数据保持排序前的顺序。
+解决办法就是在排序的最后一个字段后面加上主键或者ROWID的排序即可解决该问题。
+</pre>
+<pre class="brush: sql;">
+	order by name,age,sex,ROWID;或
+	order by name,age,sex,ID
+</pre>
+<pre>
+    但是应该注意：一个查询中使用了分组函数和排序函数，任何排序字段不在分组函数则必须要在group by中，否则出错。ORA-00979：不是group by表达式。
+分组函数包括 ：AVG\SUM\MIN\MAX\COUNT\STDDEV\VARIANCE。
+</pre>
