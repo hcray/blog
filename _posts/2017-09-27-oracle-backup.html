@@ -1,0 +1,32 @@
+---
+layout: post
+title: 数据库还原
+category: oracle
+description: oracle数据库从一个环境还原到另外一个环境
+keywords: linux,oracle
+---
+<p>oracle</p>
+<pre >
+1、切换oracle用户切换目录/home/oracle
+
+2、删除vmp用户，drop user vmp cascade;
+
+3、创建用户
+create user vmp identified by vmp
+default tablespace VMP_DATA
+temporary tablespace VMP_TEMP;
+--基本权限
+grant connect,resource to vmp;
+--创建DB Link权限
+grant create database link to vmp;
+--创建视图权限
+grant create view to vmp;
+
+4、导出文件
+exp system/oracle@DHVMS owner=VMP file=VMP.dmp log=exp_VMP.log
+
+5、导入文件
+imp system/oracle fromuser=VMP touser=VMP file=VMP.dmp log=imp_VMP.log ignore=y
+
+6、删除正式环境的dblink,用户邮箱等。
+</pre>
