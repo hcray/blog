@@ -1,0 +1,161 @@
+---
+layout: post
+title: linux启动oracle
+category: oracle
+description: linux启动oracle
+keywords: oracle,linux
+---
+<p>linux启动oracle</p>
+<pre>
+启动oracle
+1、启动数据库
+su - oracle
+[oracle@nstlbeta bin]$ sqlplus /nolog  //登录sqlplus
+SQL> connect /as sysdba  //连接oracle
+SQL> startup //起动数据库
+SQL> exit  //退出sqlplus ，起动监听
+
+2、启动监听
+[oracle@nstlbeta bin]$ cd $ORACLE_HOME/bin //进入oracle安装目录
+[oracle@nstlbeta bin]$ lsnrctl start  //起动监听
+
+3、查看环境变量
+     env
+4、 connect <username>/<password>@<连接标识符>
+
+
+七、启动oracle数据库
+su - oracle #切换到oracle用户
+sqlplus /nolog #进入sqlplus
+conn / as sysdba #以超级管理员权限登录
+startup #启动数据库实例
+quit #退出
+lsnrctl start #启动监听
+startup参数说明：
+startup #不带任何参数，启动数据库实例并打开数据库,一般选择这种启动方式
+startup nomount #只启动数据库实例，不打开数据库，一般用于创建新的数据库时使用
+startup mount #启动数据库实例，并加载数据库，但不打开数据库，一般用于修改数据库名称等管理时使用
+八、关闭oracle数据库
+su - oracle #切换到oracle用户
+lsnrctl stop #关闭监听器
+sqlplus /nolog #进入sqlplus
+shutdown immediate #关闭数据库实例
+quit #退出
+shutdown参数说明：
+normal #等待所有的用户断开连接，执行命令后不允许新连接
+immediate #等待用户完成当前的语句后，再断开用户连接，不允许新用户连接
+transactional #等待用户完成当前的事务后断开连接，不允许新用户连接
+abort #强行断开连接并直接关闭数据库
+前面三种方法不会导致数据库出错，最后一种方法非特殊状况不建议使用，
+一般使用shutdown immediate关闭数据库
+备注：如果执行shutdown immediate出现ORA-01012: not logged on错误
+请先执行以下语句
+ps -ef|grep ora_dbw0_$orcl
+kill -9 pid #pid为进程号
+其中orcl 是数据库的SID
+九、设置oracle开机启动
+说明：linux下默认安装完Oracle后不会实现开机自启动
+1、su - root #切换到root用户操作
+/data/oracle/product/11.2.0/db_1/root.sh #执行脚本，生成/etc/oratab文件
+/data/oraInventory/orainstRoot.sh
+ 2、vi /etc/oratab  #编辑
+找到：$ORACLE_SID:$ORACLE_HOME:<N|Y>:
+取消前面的#注释，修改为：
+orcl:/data/oracle/product/11.2.0/db_1:Y  #orcl为oracle数据库实例名称
+:wq! #保存退出
+3、vi /data/oracle/product/11.2.0/db_1/bin/dbstart #编辑
+找到：ORACLE_HOME_LISTNER=$1
+修改为：ORACLE_HOME_LISTNER=$ORACLE_HOME
+4、vi /data/oracle/product/11.2.0/db_1/bin/dbshut #编辑
+找到：ORACLE_HOME_LISTNER=$1
+修改为：ORACLE_HOME_LISTNER=$ORACLE_HOME
+5、创建oracle启动脚本
+vi /etc/init.d/oracle #编辑，添加以下代码
+##########################################################
+#!/bin/sh
+# chkconfig: 0356 99 10
+# description: Startup Script for Oracle Databases
+# Script path：/etc/init.d/oracle
+# Author：www.osyunwei.com by qihang01
+#
+ORACLE_BASE=/data/oracle
+ORACLE_HOME=$ORACLE_BASE/product/11.2.0/db_1
+ORACLE_SID=orcl
+PATH=$ORACLE_HOME/bin:/usr/sbin:$PATH
+export ORACLE_BASE ORACLE_HOME ORACLE_SID PATH
+#
+ORA_OWNR="oracle"
+#
+if [ ! -f $ORACLE_HOME/bin/dbstart -o ! -d $ORACLE_HOME ]
+then
+echo "Oracle startup: cannot start"
+exit 1
+fi
+#
+case "$1" in
+start)
+su - $ORA_OWNR -lc $ORACLE_HOME/bin/dbstart
+echo "Oracle Start Succesful!"
+;;
+stop)
+#
+su - $ORA_OWNR -lc $ORACLE_HOME/bin/dbshut
+echo "Oracle Stop Succesful!"
+;;
+restart)
+$0 stop
+$0 start
+;;
+*)
+echo $"Usage: `basename $0` {start|stop|restart}"
+exit 1
+esac
+exit 0
+##########################################################
+:wq! #保存退出
+chown oracle.oinstall /etc/init.d/oracle #更改文件所有者
+chmod 755 /etc/init.d/oracle #添加执行权限
+ln -s /etc/init.d/oracle /etc/rc3.d/S99oracle #添加系统启动级别3软连接
+ln -s /etc/init.d/oracle /etc/rc5.d/S99oracle #添加系统启动级别5软连接
+ln -s /etc/init.d/oracle /etc/rc0.d/K01oracle #添加系统关机软连接
+ln -s /etc/init.d/oracle /etc/rc6.d/K01oracle #添加系统重启软连接
+chkconfig --add oracle #添加系统服务
+chkconfig oracle on #设置开机启动
+备注：# chkconfig: 0356 99 10
+0356：定义运行级别
+99：开机启动优先级（数字越大启动越晚）
+10：关机停止优先级（数字越小关闭越早）
+系统运维 www.osyunwei.com 温馨提醒：qihang01原创内容 版权所有,转载请注明出处及原文链接
+6、恢复操作系统标识
+vi /etc/redhat-release #编辑
+把：redhat-4
+修改为：CentOS release 5.8 (Final)
+:wq! #保存退出
+7、更改系统默认启动级别为3
+vi /etc/inittab #编辑
+id:3:initdefault: #修改5为3
+:wq! #保存退出
+8、测试
+shutdown -r now #重启系统
+service oracle start #启动oracle
+service oracle stop #关闭oracle
+/etc/init.d/oracle restart #重启oracle
+su - oracle #切换到oracle用户
+dbstart #启动oracle
+dbshut #关闭oracle
+ps -efw | grep ora #查看oracle进程
+ps -efw | grep LISTEN | grep -v gre #查看oracle端口监听
+lsnrctl status #查看oracle运行状态
+至此，CentOS下安装Oracle 11g R2教程完成。
+扩展阅读：
+使用vnc远程连接来安装Oracle，如果出现错误，不能启动安装界面，请做以下操作！
+用 root ssh登录
+vncserver #启动vnc
+New 'www:1 (root)' desktop is www:1   #记住www:1，后面会用到！
+export DISPLAY=www:1 #输入
+service vncserver start #启动vnc
+使用vnc客户端 root 登录
+xhost +
+su - oracle  #切换到oracle用户
+./runInstaller #执行安装
+</pre>
