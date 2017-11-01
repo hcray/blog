@@ -1,0 +1,175 @@
+---
+layout: post
+title: SpringMVC接收复杂集合参数
+category: spring
+description: SpringMVC接收复杂集合参数
+keywords: spring,springmvc
+---
+<p>SpringMVC接收复杂集合参数</p>
+<pre>
+    Spring MVC在接收集合请求参数时，需要在Controller方法的集合参数里前添加@RequestBody，
+    而@RequestBody默认接收的enctype (MIME编码)是application/json，因此发送POST请求时需要设置请求报文头信息，
+    否则Spring MVC在解析集合请求参数时不会自动的转换成JSON数据再解析成相应的集合。
+    以下列举接收List&lt;String&gt;、List&lt;User&gt;、List&lt;Map&lt;String,Object&gt;&gt;、User[]、User(bean里面包含List)几种较为复杂的集合参数示例：
+</pre>
+    <h4>接收List&lt;String&gt;集合参数：</h4>
+<pre>
+1、页面js代码：
+</pre>
+<pre class="brush: javascript;">
+	 var idList = new Array();
+	 idList.push(“1”);
+	 idList.push(“2”);
+	 idList.push(“3”);
+	 var isBatch = false;
+	 $.ajax({
+	     type: "POST",
+	     url: "<%=path%>/catalog.do?fn=deleteCatalogSchemes",
+	    dataType: 'json',
+	     data: {"idList":idList,"isBatch":isBatch},
+	     success: function(data){
+	         …
+	     },
+	     error: function(res){
+	         …
+	     }
+	 });
+</pre>
+<pre>
+     2、Controller方法：
+</pre>
+<pre class="brush: java;">
+ @Controller
+ @RequestMapping("/catalog.do")
+ public class CatalogController {
+     @RequestMapping(params = "fn=deleteCatalogSchemes")
+     @ResponseBody
+     public AjaxJson deleteCatalogSchemes(@RequestParam("idList[]") List&lt;String&gt; idList,Boolean isBatch) {
+             …
+     }
+ }
+</pre>
+<h4>接收List&lt;User&gt;、User[]集合参数：</h4>
+<pre> 1、User实体类：</pre>
+<pre class="brush: java;">
+	public class User {
+	        private String name;
+	    private String pwd;
+	    //省略getter/setter
+	}
+</pre>
+<pre>2、页面js代码：</pre>
+<pre class="brush: javascript;">
+	var userList = new Array();
+	userList.push({name: "李四",pwd: "123"});
+	userList.push({name: "张三",pwd: "332"});
+	$.ajax({
+	    type: "POST",
+	    url: "<%=path%>/catalog.do?fn=saveUsers",
+	    data: JSON.stringify(userList),//将对象序列化成JSON字符串
+	    dataType:"json",
+	    contentType : 'application/json;charset=utf-8', //设置请求头信息
+	     success: function(data){
+	         …
+	     },
+	     error: function(res){
+	         …
+	     }
+	 });
+</pre>
+<pre>
+3、Controller方法：
+</pre>
+<pre class="brush: java;">
+	@Controller
+	@RequestMapping("/catalog.do")
+	public class CatalogController {
+
+	    @RequestMapping(params = "fn=saveUsers")
+	    @ResponseBody
+	    public AjaxJson saveUsers(@RequestBody List&lt;User&gt; userList) {
+	        …
+	    }
+	 }
+</pre>
+<pre>如果想要接收User[]数组，只需要把saveUsers的参数类型改为@RequestBody User[] userArray就行了。</pre>
+<h4>接收List&lt;Map&lt;String,Object&gt;&gt;集合参数：</h4>
+<pre> 1、页面js代码（不需要User对象了）：</pre>
+<pre class="brush: javascript;">
+	var userList = new Array();
+	userList.push({name: "李四",pwd: "123"});
+	userList.push({name: "张三",pwd: "332"});
+	$.ajax({
+	    type: "POST",
+	    url: "<%=path%>/catalog.do?fn=saveUsers",
+	    data: JSON.stringify(userList),//将对象序列化成JSON字符串
+	    dataType:"json",
+	    contentType : 'application/json;charset=utf-8', //设置请求头信息
+	     success: function(data){
+	         …
+	     },
+	     error: function(res){
+	         …
+	     }
+	 });
+</pre>
+<pre>2、Controller方法：</pre>
+<pre class="brush: java;">
+	@Controller
+	@RequestMapping("/catalog.do")
+	public class CatalogController {
+
+	    @RequestMapping(params = "fn=saveUsers")
+	    @ResponseBody
+	    public AjaxJson saveUsers(@RequestBody List&lt;Map&lt;String,Object&gt;&gt; listMap) {
+	        …
+	    }
+	 }
+</pre>
+<h4>接收User(bean里面包含List)集合参数:</h4>
+<pre>User实体类：</pre>
+<pre class="brush: java;">
+    public class User {
+        private String name;
+        private String pwd;
+        private List&lt;User&gt; customers;//属于用户的客户群
+        //省略getter/setter
+    }
+</pre>
+<pre>2、页面js代码：</pre>
+<pre class="brush: javascript;">
+	var customerArray = new Array();
+	customerArray.push({name: "李四",pwd: "123"});
+	customerArray.push({name: "张三",pwd: "332"});
+	var user = {};
+	user.name = "李刚";
+	user.pwd = "888";
+	user. customers = customerArray;
+	$.ajax({
+	    type: "POST",
+	     url: "<%=path%>/catalog.do?fn=saveUsers",
+	     data: JSON.stringify(user),//将对象序列化成JSON字符串
+	     dataType:"json",
+	     contentType : 'application/json;charset=utf-8', //设置请求头信息
+	     success: function(data){
+	         …
+	     },
+	     error: function(res){
+	         …
+	     }
+	 });
+</pre>
+<pre> 3、Controller方法：</pre>
+<pre class="brush: java;">
+	@Controller
+	@RequestMapping("/catalog.do")
+	public class CatalogController {
+
+	    @RequestMapping(params = "fn=saveUsers")
+	    @ResponseBody
+	    public AjaxJson saveUsers(@RequestBody User user) {
+	        List&lt;User&gt; customers = user.getCustomers();
+	        …
+	     }
+	 }
+</pre>
