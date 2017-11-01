@@ -1,0 +1,64 @@
+---
+layout: post
+title: Linux备份文件
+category: linux
+description: Linux备份文件
+keywords: linux,crontab,nfs
+---
+<p>Linux备份文件</p>
+<pre>
+使用命令 crontab -e 然后直接编辑定时脚本
+使用命令 vi /etc/crontab 编辑定时脚本
+
+	（系统级的）做系统级配置我们会直接配置 /etc/crontab
+	（用户级的）一般还是建议大家使用 crontab -e ，这样系统也会帮着检查我们配置的脚本语法
+
+</pre>
+<pre>
+crontab -l
+
+##########back fs every day##############
+0   1    *    *     *    /oracle/fs_bak/bak_fs.sh>/oracle/fs_bak/bak_fs.sh.log 2>&1
+
+> 输出到文件中，并清空之前的
+>> 追加
+2>&1 标准输入调整到日志中
+
+bak_fs.sh
+
+</pre>
+<pre class="brush: shell;">
+#!/bin/bash
+
+
+dvar1=`date +%Y%m%d`
+dvar2=`date +"%Y%m%d" -d "yesterday"`
+
+if [ -d "/oracle/fs/attachment/${dvar2}/" ]; then
+    cp -R /oracle/fs/attachment/${dvar2}/  /oracle/fs_bak/
+
+    cd /oracle/fs_bak
+
+    tar cvf ${dvar2}.zip ${dvar2}
+
+    rm -rf ${dvar2}
+fi
+</pre>
+
+<pre>
+    Linux nfs 共享文件
+
+    1、两边同时创建项目目录的文件 chmod 777 fs_bak
+    2、服务端：
+     [root@dts-web02 attached]# more /etc/exports
+     /oracle/fs_bak 10.1.0.43(rw)
+
+     重启服务
+    service nfslock restart
+    service rpcbind restart
+    service nfs restart  （可以不用启动）
+
+    3、客户端：挂载
+
+    mount -t nfs -o nolock 10.1.0.44:/oracle/fs_bak  /oracle/fs_bak
+</pre>
