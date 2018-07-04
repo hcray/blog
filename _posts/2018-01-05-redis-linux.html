@@ -1,0 +1,143 @@
+---
+layout: post
+title: redis 安装和自启动
+category: redis,linux
+description: redis 安装和自启动
+keywords: redis
+---
+<p>redis 安装和自启动</p>
+<pre>
+1、安装
+$ wget http://download.redis.io/releases/redis-3.2.1.tar.gz
+$ tar xzf redis-3.2.1.tar.gz
+$ cd redis-3.2.1
+$ make
+
+cd src
+make test
+
+cd ../utilsls
+./install_server.sh
+
+
+ps axu | grep redis
+
+关闭redis服务，修改配置文件，添加密码
+redis-cli -h 127.0.0.1 -p 6379 shutdown
+
+$ src/redis-cli
+redis> set foo baramake
+OK
+redis> get foo
+"bar"
+
+2、密码设置
+
+我们可以通过以下命令查看是否设置了密码验证：
+
+127.0.0.1:6379> CONFIG get requirepass
+1) "requirepass"
+2) ""
+
+127.0.0.1:6379> CONFIG set requirepass "abc"
+OK
+127.0.0.1:6379> CONFIG get requirepass
+1) "requirepass"
+2) "abc"
+
+127.0.0.1:6379> AUTH password
+
+127.0.0.1:6379> AUTH "abc"
+
+3、Centos开机自启动redis
+
+Installing Redis
+-----------------
+
+In order to install Redis binaries into /usr/local/bin just use:
+
+    % make install
+
+	You can use `make PREFIX=/some/other/directory install` if you wish to use a different destination.
+
+	Make install will just install binaries in your system, but will not configure
+	init scripts and configuration files in the appropriate place. This is not
+	needed if you want just to play a bit with Redis, but if you are installing
+	it the proper way for a production system, we have a script doing this
+	for Ubuntu and Debian systems:
+
+	% cd utils
+    % ./install_server.sh
+
+	The script will ask you a few questions and will setup everything you need
+	to run Redis properly as a background daemon that will start again on system reboots.
+
+	You'll be able to stop and start Redis using the script named
+	`/etc/init.d/redis_<portnumber>`, for instance `/etc/init.d/redis_6379`.
+
+	Code contributions
+	---
+
+	Note: by contributing code to the Redis project in any form, including sending
+	a pull request via Github, a code fragment or patch via private email or
+	public discussion groups, you agree to release your code under the terms
+	of the BSD license that you can find in the [COPYING][1] file included in the Redis
+	source distribution.
+
+	Please see the [CONTRIBUTING][2] file in this source distribution for more information.
+	Enjoy
+
+	1、在/etc/init.d/下查看所有的service或者chkconfig
+	2、service redis start启动redis
+
+	[1]: https://github.com/antirez/redis/blob/unstable/COPYING
+	[2]: https://github.com/antirez/redis/blob/unstable/CONTRIBUTING
+
+
+
+	hadoop@stormspark:~/workspace/redis2.6.13/src$ make test
+	You need tcl 8.5 or newer in order to run the Redis test
+	make: *** [test] Error 1
+
+
+
+	[html] view plain copy
+		1.
+	wget http://downloads.sourceforge.net/tcl/tcl8.6.1-src.tar.gz
+		2.
+	sudo tar xzvf tcl8.6.1-src.tar.gz  -C /usr/local/
+		3.
+	cd  /usr/local/tcl8.6.1/unix/
+		4.
+	sudo ./configure
+		5.
+	sudo make
+		6.
+	sudo make install
+		7.
+
+
+
+
+
+	make
+	iptables -A INPUT -p tcp --dport 6379 -j ACCEPT
+	iptables -A OUTPUT -p tcp --sport 6379 -j ACCEPT
+
+	如何停止/重启/启动redis服务更多2
+
+
+	redis
+
+
+
+	如果是用apt-get或者yum install安装的redis，可以直接通过下面的命令停止/启动/重启redis
+
+	/etc/init.d/redis-server stop
+	/etc/init.d/redis-server start
+	/etc/init.d/redis-server restart
+	如果是通过源码安装的redis，则可以通过redis的客户端程序redis-cli的shutdown命令来重启redis
+	redis-cli -h 127.0.0.1 -p 6379 shutdown
+	如果上述方式都没有成功停止redis，则可以使用终极武器 kill -9
+
+</pre>

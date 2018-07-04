@@ -1,0 +1,74 @@
+---
+layout: post
+title: zookeeper集群搭建
+category: zookeeper,linux
+description: zookeeper集群搭建
+keywords: zookeeper
+---
+<p>zookeeper</p>
+<pre>
+zookeeper集群搭建
+
+准备环境服务器1：10.1.248.15 cicloud-zk-01 端口：2181、2881、3881
+服务器2：10.1.248.16 cicloud-zk-02 端口：2182、2882、3882
+服务器3：10.1.248.17 cicloud-zk-03 端口：2183、2883、3883
+jdk version jdk8.131
+zk version 3.4.121.安装
+wget http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.12/
+tar -zxvf zookeeper-3.4.12.tar.gz /usr/local/tar -zxvf zookeeper-3.4.12.tar.gz /usr/local
+mv zookeeper-3.4.12 zk
+mkdir /usr/local/zk/data
+mkdir /usr/local/zk/logs
+配置
+mkdir /usr/local/zk/data
+mkdir /usr/local/zk/logs
+mv /usr/local/zk/conf/zoo_sample.cfg zoo.cfg
+vi zoo.cfg
+
+
+dataDir=/usr/local/zk/data
+dataLogDir=/usr/local/zk/logs
+server.1=10.1.248.15:2881:3881
+server.2=10.1.248.16:2882:3882
+server.3=10.1.248.17:2883:3883
+
+
+
+
+autopurge.snapRetainCount=3
+
+
+
+
+touch /usr/local/zk/data/myid
+三台服务顺序 按顺序 一次写入1 2 3
+echo 1 > /usr/local/zk/data/myid
+echo 2 > /usr/local/zk/data/myid
+echo 3 > /usr/local/zk/data/myid
+启动服务
+/usr/local/zk/bin/zkServer.sh start
+查看三台服务器的状态
+
+/usr/local/zk/bin/zkServer.sh status
+
+服务器1
+
+ZooKeeper JMX enabled by default
+Using config: /usr/local/zk/bin/../conf/zoo.cfg
+Mode: follower
+
+服务器2
+
+ZooKeeper JMX enabled by default
+Using config: /usr/local/zk/bin/../conf/zoo.cfg
+Mode: leader
+
+服务器3
+
+ZooKeeper JMX enabled by default
+Using config: /usr/local/zk/bin/../conf/zoo.cfg
+Mode: follower
+
+到此集群搭建成功, 可以用taokeeper来监控zk集群状态
+
+</pre>

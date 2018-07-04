@@ -1,0 +1,152 @@
+---
+layout: post
+title: Elasticsearch安装
+category: Elasticsearch,linux
+description: Elasticsearch安装
+keywords: Elasticsearch
+---
+<p>Elasticsearch</p>
+<pre>
+# ======================== Elasticsearch Configuration =========================
+#
+# NOTE: Elasticsearch comes with reasonable defaults for most settings.
+#       Before you set out to tweak and tune the configuration, make sure you
+#       understand what are you trying to accomplish and the consequences.
+#
+# The primary way of configuring a node is via this file. This template lists
+# the most important settings you may want to configure for a production cluster.
+#
+# Please consult the documentation for further information on configuration options:
+# https://www.elastic.co/guide/en/elasticsearch/reference/index.html
+#
+# ---------------------------------- Cluster -----------------------------------
+#
+# Use a descriptive name for your cluster:
+#
+cluster.name: weci-es
+#
+# ------------------------------------ Node ------------------------------------
+#
+# Use a descriptive name for the node:
+#
+node.name: elastic14
+#
+# Add custom attributes to the node:
+#
+#node.attr.rack: r1
+#
+# ----------------------------------- Paths ------------------------------------
+#
+# Path to directory where to store the data (separate multiple locations by comma):
+#
+#path.data: /path/to/data
+#
+# Path to log files:
+#
+#path.logs: /path/to/logs
+#
+# ----------------------------------- Memory -----------------------------------
+#
+# Lock the memory on startup:
+#
+bootstrap.memory_lock: false
+#
+# Make sure that the heap size is set to about half the memory available
+# on the system and that the owner of the process is allowed to use this
+# limit.
+#
+# Elasticsearch performs poorly when the system is swapping the memory.
+#
+# ---------------------------------- Network -----------------------------------
+#
+# Set the bind address to a specific IP (IPv4 or IPv6):
+#
+network.host: 10.1.248.14
+#
+# Set a custom port for HTTP:
+#
+http.port: 9200
+#
+# For more information, consult the network module documentation.
+#
+# --------------------------------- Discovery ----------------------------------
+#
+# Pass an initial list of hosts to perform discovery when new node is started:
+# The default list of hosts is ["127.0.0.1", "[::1]"]
+#
+discovery.zen.ping.unicast.hosts: ["10.1.248.14", "10.1.248.15", "10.1.248.16"]
+#
+# Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
+#
+discovery.zen.minimum_master_nodes: 2
+#
+# For more information, consult the zen discovery module documentation.
+#
+# ---------------------------------- Gateway -----------------------------------
+#
+# Block initial recovery after a full cluster restart until N nodes are started:
+#
+#gateway.recover_after_nodes: 3
+#
+# For more information, consult the gateway module documentation.
+#
+# ---------------------------------- Various -----------------------------------
+#
+# Require explicit names when deleting indices:
+#
+#action.destructive_requires_name: true
+
+bootstrap.system_call_filter: false
+
+
+
+
+
+
+切换到root用户
+vi /etc/security/limits.conf
+添加如下内容:
+
+
+
+* soft nofile 65536
+
+* hard nofile 131072
+
+* soft nproc 2048
+
+* hard nproc 4096
+
+
+vi /etc/security/limits.d/90-nproc.conf
+
+
+
+修改如下内容：
+
+* soft nproc 1024
+
+#修改为
+
+* soft nproc 2048
+
+
+vi /etc/sysctl.conf
+
+
+添加下面配置：
+
+vm.max_map_count=655360
+
+
+并执行命令：
+
+sysctl -p
+然后，重新启动elasticsearch，即可启动成功。
+
+
+
+
+./elasticsearch -d 后台启动
+
+</pre>
