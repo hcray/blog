@@ -1,0 +1,25 @@
+---
+layout: post
+title: git修改提交作者和邮箱
+category: git,linux
+description: git修改提交作者和邮箱
+keywords: git,linux
+---
+<p>git</p>
+<pre>
+git修改提交作者和邮箱
+
+    我们会经常使用不同的代码仓库，时常不同仓库会有作者信息验证比如公司内建的gitlab一般会要求统一使用公司内部的域账号签名;
+github上要求使用的github账号签名等。因此，很容易犯在不同库中提交代码发现默认配置的作者信息没有变更，结果推被拒绝。
+下面介绍几种常用的解决方式，当然最终还是需要养成切换代码库检查撰文信息的习惯，主动配置
+<pre class="brush: linux;">
+	// 设置全局
+    git config --global user.name "Author Name"
+    git config --global user.email "Author Email"
+
+    // 或者设置本地项目库配置
+    git config user.name "Author Name"
+    git config user.email "Author Email"
+</pre>
+
+</pre>
