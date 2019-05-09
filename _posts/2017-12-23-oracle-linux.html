@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Linux下oracle数据库安装
-category: oracle,linux
+category: oracle
 description: oracle数据库安装
 keywords: linux,oracle
 ---
@@ -9,165 +9,164 @@ keywords: linux,oracle
 <pre >
 一、修改操作系统核心参数(测试环境可以不修改，默认安装)，具体详细的参数配置参见官方文档
     1、修改内核参数
-root用户：修改 /etc/sysctl.conf 文件，加上如下参数
-fs.aio-max-nr = 1048576
-fs.file-max = 6815744
-kernel.shmall = 2097152
-kernel.shmmax = 536870912
-kernel.shmmni = 4096
-kernel.sem = 250 32000 100 128
-net.ipv4.ip_local_port_range = 9000 65500
-net.core.rmem_default = 262144
-net.core.rmem_max = 4194304
-net.core.wmem_default = 262144
-net.core.wmem_max = 1048586
-为使上述配置生效而不重启系统，执行如下命令
-# /sbin/sysctl -p
+    root用户：修改 /etc/sysctl.conf 文件，加上如下参数
+    fs.aio-max-nr = 1048576
+    fs.file-max = 6815744
+    kernel.shmall = 2097152
+    kernel.shmmax = 536870912
+    kernel.shmmni = 4096
+    kernel.sem = 250 32000 100 128
+    net.ipv4.ip_local_port_range = 9000 65500
+    net.core.rmem_default = 262144
+    net.core.rmem_max = 4194304
+    net.core.wmem_default = 262144
+    net.core.wmem_max = 1048586
+    为使上述配置生效而不重启系统，执行如下命令
+    # /sbin/sysctl -p
 
 2、修改用户限制
-root用户：修改 /etc/security/limits.conf 文件，加上下面的参数
-oracle           soft    nproc   2047
-oracle           hard    nproc   16384
-oracle           soft    nofile  1024
-oracle           hard    nofile  65536
+    root用户：修改 /etc/security/limits.conf 文件，加上下面的参数
+    oracle           soft    nproc   2047
+    oracle           hard    nproc   16384
+    oracle           soft    nofile  1024
+    oracle           hard    nofile  65536
 
 3、修改用户验证选项
-root用户下：修改/etc/pam.d/login文件加上如下参数
-session    required     pam_limits.so
+    root用户下：修改/etc/pam.d/login文件加上如下参数
+    session    required     pam_limits.so
 
 4、修改用户配置文件
-root用户下：修改/etc/profile文件加入如下参数：
-if [ $USER = "oracle" ]; then
-        if [ $SHELL = "/bin/ksh" ]; then
-              ulimit -p 16384
-              ulimit -n 65536
-        else
-              ulimit -u 16384 -n 65536
-        fi
-fi
+    root用户下：修改/etc/profile文件加入如下参数：
+    if [ $USER = "oracle" ]; then
+            if [ $SHELL = "/bin/ksh" ]; then
+                  ulimit -p 16384
+                  ulimit -n 65536
+            else
+                  ulimit -u 16384 -n 65536
+            fi
+    fi
 
 二、修改linux内核参数(测试环境可以不修改，默认安装)，具体详细的参数配置参见官方文档
 
 三、创建用户、用户组
-groupadd oinstall
+    groupadd oinstall
 
-groupadd dba
+    groupadd dba
 
-useradd -g oinstall -G dba oracle
+    useradd -g oinstall -G dba oracle
 
-passwd oracle
+    passwd oracle
 
 四、创建目录，设置目录的所有者
 
-# mkdir -p /u01/app/
-# chown -R oracle:oinstall /u01/app/
-# chmod -R 775 /u01/app/
+    # mkdir -p /u01/app/
+    # chown -R oracle:oinstall /u01/app/
+    # chmod -R 775 /u01/app/
 
 五、配置用户的环境变量
-su oracle
+    su oracle
 
-vi  .bash_profile
+    vi  .bash_profile
 
-添加
+    添加
 
-export ORACLE_BASE=/u01/app/oracle
-export ORACLE_HOME=$ORACLE_BASE/product/11.2.0/dbhome_1
-export ORACLE_SID=orcl
-export PATH=$PATH:HOME/bin:$ORACLE_HOME/bin
+    export ORACLE_BASE=/u01/app/oracle
+    export ORACLE_HOME=$ORACLE_BASE/product/11.2.0/dbhome_1
+    export ORACLE_SID=orcl
+    export PATH=$PATH:HOME/bin:$ORACLE_HOME/bin
 
-立即生效
-source .bash_profile
+    立即生效
+    source .bash_profile
 
 
-切换Oracle环境，使用su -oracle 或 su -l oracle，这样会连同PATH等环境变量都转成新用户的环境
+    切换Oracle环境，使用su -oracle 或 su -l oracle，这样会连同PATH等环境变量都转成新用户的环境
 
 六、安装数据库(1、Create and configure a database 2、install database software only)
-Create and configure a database
-就是下一步，一直安装，和window下安装没有什么区别了。不做介绍。
-1、解压文件，设置owner
-unzip p10404530_112030_Linux-x86-64_1of7.zip
-unzip p10404530_112030_Linux-x86-64_2of7.zip
-chown -R oracle:oinstall database/
-2、安装x-window yum groupinstall "X Window System" "Desktop" -y
+    Create and configure a database
+    就是下一步，一直安装，和window下安装没有什么区别了。不做介绍。
+    1、解压文件，设置owner
+    unzip p10404530_112030_Linux-x86-64_1of7.zip
+    unzip p10404530_112030_Linux-x86-64_2of7.zip
+    chown -R oracle:oinstall database/
+    2、安装x-window yum groupinstall "X Window System" "Desktop" -y
 
-先切换到root用户，执行xhost +（）
-正常返回：access control disabled,clients can connect from any host
-切回oracle用户，执行：export DISPLAY=192.168.1.2：0.0
-比如你的oracle服务器ip是192.168.0.1，访问的客户端的ip是192.168.1.2，当你用192.168.1.2连接上数据库后，希望在192.168.1.2上显示图像界面，这是就需要export DISPLAY=192.168.1.2：0.0
+    先切换到root用户，执行xhost +（）
+    正常返回：access control disabled,clients can connect from any host
+    切回oracle用户，执行：export DISPLAY=192.168.1.2：0.0
+    比如你的oracle服务器ip是192.168.0.1，访问的客户端的ip是192.168.1.2，当你用192.168.1.2连接上数据库后，希望在192.168.1.2上显示图像界面，这是就需要export DISPLAY=192.168.1.2：0.0
 
-3、运行./runInstaller 进入安装界面
+    3、运行./runInstaller 进入安装界面
 
-（1）安装数据库
-</pre>
-<image src="/images/oracle/1.PNG"></image>
-<image src="/images/oracle/2.PNG"></image>
-<image src="/images/oracle/3.PNG"></image>
-<image src="/images/oracle/4.PNG"></image>
-<image src="/images/oracle/5.PNG"></image>
-<image src="/images/oracle/6.PNG"></image>
-<image src="/images/oracle/7.PNG"></image>
-<image src="/images/oracle/8.PNG"></image>
-<image src="/images/oracle/9.PNG"></image>
-<image src="/images/oracle/10.PNG"></image>
-<image src="/images/oracle/11.PNG"></image>
-<image src="/images/oracle/12.PNG"></image>
-<image src="/images/oracle/13.PNG"></image>
-<div>新开一个窗口，用root账户执行脚本</div>
-<image src="/images/oracle/14.PNG"></image>
-<pre>
-2）配置监听
-oracle用户执行命令
-netca (net configuration)
-</pre>
-<image src="/images/oracle/net1.PNG"></image>
-<image src="/images/oracle/net2.PNG"></image>
-<image src="/images/oracle/net3.PNG"></image>
-<image src="/images/oracle/net4.PNG"></image>
-<image src="/images/oracle/net5.PNG"></image>
-<image src="/images/oracle/net6.PNG"></image>
-<image src="/images/oracle/net7.PNG"></image>
-<image src="/images/oracle/net8.PNG"></image>
-<pre>
-（3）创建数据库
-oracle用户执行命令
-dbca      (database configuration)
-</pre>
-<image src="/images/oracle/db1.PNG"></image>
-<image src="/images/oracle/db2.PNG"></image>
-<image src="/images/oracle/db3.PNG"></image>
-<image src="/images/oracle/db4.PNG"></image>
-<image src="/images/oracle/db5.PNG"></image>
-<image src="/images/oracle/db6.PNG"></image>
-<image src="/images/oracle/db7.PNG"></image>
-<image src="/images/oracle/db8.PNG"></image>
-<image src="/images/oracle/db9.PNG"></image>
-<image src="/images/oracle/db10.PNG"></image>
-<pre>注意选择编码，要支持中文</pre>
-<image src="/images/oracle/db11.PNG"></image>
-<image src="/images/oracle/db12.PNG"></image>
+    (1)安装数据库
+    </pre>
+    <image src="/images/oracle/1.PNG"></image>
+    <image src="/images/oracle/2.PNG"></image>
+    <image src="/images/oracle/3.PNG"></image>
+    <image src="/images/oracle/4.PNG"></image>
+    <image src="/images/oracle/5.PNG"></image>
+    <image src="/images/oracle/6.PNG"></image>
+    <image src="/images/oracle/7.PNG"></image>
+    <image src="/images/oracle/8.PNG"></image>
+    <image src="/images/oracle/9.PNG"></image>
+    <image src="/images/oracle/10.PNG"></image>
+    <image src="/images/oracle/11.PNG"></image>
+    <image src="/images/oracle/12.PNG"></image>
+    <image src="/images/oracle/13.PNG"></image>
+    <div>新开一个窗口，用root账户执行脚本</div>
+    <image src="/images/oracle/14.PNG"></image>
+    <pre>
+    (2)配置监听
+    oracle用户执行命令
+    netca (net configuration)
+    </pre>
+    <image src="/images/oracle/net1.PNG"></image>
+    <image src="/images/oracle/net2.PNG"></image>
+    <image src="/images/oracle/net3.PNG"></image>
+    <image src="/images/oracle/net4.PNG"></image>
+    <image src="/images/oracle/net5.PNG"></image>
+    <image src="/images/oracle/net6.PNG"></image>
+    <image src="/images/oracle/net7.PNG"></image>
+    <image src="/images/oracle/net8.PNG"></image>
+    <pre>
+    （3）创建数据库
+    oracle用户执行命令
+    dbca      (database configuration)
+    </pre>
+    <image src="/images/oracle/db1.PNG"></image>
+    <image src="/images/oracle/db2.PNG"></image>
+    <image src="/images/oracle/db3.PNG"></image>
+    <image src="/images/oracle/db4.PNG"></image>
+    <image src="/images/oracle/db5.PNG"></image>
+    <image src="/images/oracle/db6.PNG"></image>
+    <image src="/images/oracle/db7.PNG"></image>
+    <image src="/images/oracle/db8.PNG"></image>
+    <image src="/images/oracle/db9.PNG"></image>
+    <image src="/images/oracle/db10.PNG"></image>
+    <pre>注意选择编码，要支持中文</pre>
+    <image src="/images/oracle/db11.PNG"></image>
+    <image src="/images/oracle/db12.PNG"></image>
 
-<pre>
+    <pre>
     七、启动数据库，启动监听，测试使用
-[oracle@nstlbeta bin]$ cd $ORACLE_HOME/bin //进入oracle安装目录
-[oracle@nstlbeta bin]$ lsnrctl start  //起动监听
+    [oracle@nstlbeta bin]$ cd $ORACLE_HOME/bin //进入oracle安装目录
+    [oracle@nstlbeta bin]$ lsnrctl start  //起动监听
+
+    1、启动数据库
+    su - oracle
+    [oracle@nstlbeta bin]$ sqlplus /nolog  //登录sqlplus
+    SQL> connect /as sysdba  //连接oracle
+    SQL> startup //起动数据库
+    SQL> exit  //退出sqlplus ，起动监听/as sya
 
 
-1、启动数据库
-su - oracle
-[oracle@nstlbeta bin]$ sqlplus /nolog  //登录sqlplus
-SQL> connect /as sysdba  //连接oracle
-SQL> startup //起动数据库
-SQL> exit  //退出sqlplus ，起动监听/as sya
 
 
+    备注：
+    1、修改编码的字符集
 
-
-备注：
-1、修改编码的字符集
-
-      $sqlplus /nolog
+    $sqlplus /nolog
 　　SQL>conn / as sysdba;
-     以上方法测试不行，用scott/tiger登陆sqlplus然后connect sys/sys as sysdba，然后输入命令即可
+    以上方法测试不行，用scott/tiger登陆sqlplus然后connect sys/sys as sysdba，然后输入命令即可
 　　若此时数据库服务器已启动，则先执行SHUTDOWN IMMEDIATE命令关闭数据库服务器，然后执行以下命令:
 　　SQL>STARTUP MOUNT;
 　　SQL>ALTER SYSTEM ENABLE RESTRICTED SESSION;
