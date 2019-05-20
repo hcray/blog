@@ -1,15 +1,15 @@
 {% include header.html  %}
 {% include titleNav.html  %}
-<div class="container">
-	<div class="blog-header">
-		<h3 class="blog-title">CYY的博客</h3>
-		<p class="lead blog-description">宠辱不惊，看庭前花开花落；去留无意，望天空云卷云舒</p>
-	</div>
-	<div class="row">
-		<div class="col-sm-8 blog-main">
-			{{ content }}
-		</div><!-- /.blog-main -->
-		{% include sidebar.html  %}<!-- /.blog-sidebar -->
-	</div><!-- /.row -->
+<div class="container" style="margin-bottom: 100px;">
+    <div class="blog-header">
+        <h3 class="blog-title">CYY的博客</h3>
+        <p class="lead blog-description">宠辱不惊，看庭前花开花落；去留无意，望天空云卷云舒</p>
+    </div>
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+            {{ content }}
+        </div><!-- /.blog-main -->
+        {% include sidebar.html %}<!-- /.blog-sidebar -->
+    </div><!-- /.row -->
 </div><!-- /.container -->
 {% include footer.html  %}
